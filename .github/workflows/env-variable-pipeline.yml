@@ -37,7 +37,7 @@ jobs:
         run: |
           docker build -t $DOCKER_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $DOCKER_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $DOCKER_REGISTRY/$ECR_REPOSITORY:latest
-
+            
       - name: Push Docker Image
         run: |
           docker push $DOCKER_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
