@@ -5,12 +5,21 @@ on: push
 jobs:
     first_job:
         runs-on: ubuntu-latest
-        steps:
+        steps:           
         - name: checkout stage
           uses: actions/checkout@v4
+
         - name: Welcome message
-          run: echo "My first GitHub Actions jobs" 
-        - name: List files
-          run: ls
-        - name: Read files
-          run: cat README.md
+          run: |
+            echo "My first GitHub Actions jobs"
+            ls -la
+            cat README.md
+
+        - name: create ASCII file or ART work 
+          run: cowsay -f dragon "Run for cover, I am a DRAGON...RAWR" >> dragon.tx
+
+        # - name: List files
+        #   run: ls
+
+        # - name: Read files
+        #   run: cat README.md
