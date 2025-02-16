@@ -1,0 +1,44 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - prod
+
+env:
+  AWS_REGION: us-east-1  # Update with your AWS region
+  ECR_REPOSITORY: my-ecr-repo  # Update with your ECR repository name
+  IMAGE_NAME: my-app  # Update with your application name
+  DOCKER_REGISTRY: 123456789012.dkr.ecr.us-east-1.amazonaws.com  # Update with your ECR registry
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $DOCKER_REGISTRY
+
+      - name: Set Build Variables
+        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $DOCKER_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $DOCKER_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $DOCKER_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Push Docker Image
+        run: |
+          docker push $DOCKER_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $DOCKER_REGISTRY/$ECR_REPOSITORY:latest
